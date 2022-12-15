@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build && cp -r ./dist ../docs",
+    "build": "astro build && node postprocess.js && cp -r ./dist ../docs",
     "preview": "astro preview",
     "astro": "astro"
   },

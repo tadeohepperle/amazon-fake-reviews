@@ -2,7 +2,7 @@ import { pseudoRandomDate, pseudoRandomName } from "./faker";
 import { shuffle } from "./utils";
 
 async function fetchData(): Promise<GuessingElement[]> {
-  let res = await fetch("amazon-fake-reviews/data.json");
+  let res = await fetch("data.json");
   let json = await res.json();
 
   return shuffle(

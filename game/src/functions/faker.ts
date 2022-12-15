@@ -12,7 +12,7 @@ function stringHashCode(str: string): number {
 }
 
 export function pseudoRandomName(seed: string): string {
-  let hash = stringHashCode(seed);
+  let hash = Math.abs(stringHashCode(seed));
   return (
     preNames[hash % preNames.length] + " " + lastNames[hash % lastNames.length]
   );
