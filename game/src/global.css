@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.surface {
+  @apply p-2 md:p-4 bg-white rounded-xl shadow-lg;
+}
+
+.button {
+  box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.2);
+  @apply transition-all;
+}
+
+.appear-later {
+  opacity: 0;
+  animation: appear var(--appear-speed) ease-in-out var(--appear-delay);
+  animation-fill-mode: forwards;
+}
+
+.appear-0 {
+  opacity: 0;
+  animation: appear var(--appear-speed) ease-in-out 0ms;
+  animation-fill-mode: forwards;
+}
+
+.appear-05 {
+  opacity: 0;
+  animation: appear var(--appear-speed) ease-in-out
+    calc(var(--appear-speed) / 2);
+  animation-fill-mode: forwards;
+}
+
+.appear-1 {
+  opacity: 0;
+  animation: appear var(--appear-speed) ease-in-out var(--appear-speed);
+  animation-fill-mode: forwards;
+}
+
+.appear-15 {
+  opacity: 0;
+  animation: appear var(--appear-speed) ease-in-out
+    calc(var(--appear-speed) * 1.5);
+  animation-fill-mode: forwards;
+}
+
+.appear-2 {
+  opacity: 0;
+  animation: appear var(--appear-speed) ease-in-out
+    calc(var(--appear-speed) * 2);
+  animation-fill-mode: forwards;
+}
+
+.appear-25 {
+  opacity: 0;
+  animation: appear var(--appear-speed) ease-in-out
+    calc(var(--appear-speed) * 2.5);
+  animation-fill-mode: forwards;
+}
+
+.appear-3 {
+  opacity: 0;
+  animation: appear var(--appear-speed) ease-in-out
+    calc(var(--appear-speed) * 3);
+  animation-fill-mode: forwards;
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+:root {
+  --appear-speed: 200ms;
+  --appear-delay: 70ms;
+}

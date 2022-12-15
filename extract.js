@@ -168,7 +168,6 @@ async function main() {
       reviews_batch.push({
         ...r,
         id: data.id,
-        title: data.title,
         rating_count: data.rating_count,
         rating_avg: data.rating_avg,
         rating1: data.rating1,
