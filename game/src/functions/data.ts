@@ -7,7 +7,6 @@ async function fetchData(): Promise<GuessingElement[]> {
 
   return shuffle(
     json.map((e: any) => {
-      console.log(e.other_reviews);
       return {
         productName: e.product_title,
         category: e.category,

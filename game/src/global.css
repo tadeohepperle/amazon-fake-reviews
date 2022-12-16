@@ -73,6 +73,34 @@
   }
 }
 
+.appear-smash {
+  opacity: 0;
+  animation: appear-smash 200ms ease-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes appear-smash {
+  0% {
+    opacity: 0;
+    transform: translate(-100px, 100px) rotate(-30deg) scale(5);
+  }
+  50% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+    transform: translate(0px, 0px) rotate(0deg) scale(1);
+  }
+  90% {
+    opacity: 1;
+    transform: translate(5px, -5px) rotate(2deg) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0px, 0px) rotate(0deg) scale(1);
+  }
+}
+
 :root {
   --appear-speed: 200ms;
   --appear-delay: 70ms;

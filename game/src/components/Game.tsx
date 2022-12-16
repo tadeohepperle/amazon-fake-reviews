@@ -38,9 +38,9 @@ const Game = (props: Props) => {
     }
     case "done": {
       belowReviewBoard = (
-        <div className="flex flex-wrap py-4 px-1">
+        <div className="flex flex-wrap py-4 px-1 items-center">
           <div className="block">
-            <div className="appear-0 flex items-center ">
+            <div className="appear-2 flex items-center ">
               <span className="text-3xl font-mono">You think:</span>
               <div
                 className={`bg-white ${
@@ -55,7 +55,7 @@ const Game = (props: Props) => {
                   : "+0"}
               </span>
             </div>
-            <div className="appear-05 flex items-center mt-4">
+            <div className="appear-3 flex items-center mt-4">
               <span className="text-3xl font-mono">AI thinks:</span>
               <div
                 className={`bg-white ${
@@ -72,17 +72,7 @@ const Game = (props: Props) => {
             </div>
           </div>
           <div className="block flex-grow">
-            <div className="appear-1 flex items-center md:justify-end mt-4 md:mt-0">
-              <span className="text-3xl font-mono">The review was:</span>
-              <div
-                className={`bg-white ${
-                  guessingElement.label ? "text-red-400" : "text-green-400"
-                } text-3xl font-bold ml-3 p-2 px-3 rounded-lg shadow`}
-              >
-                {guessingElement.label ? "FAKE" : "REAL"}
-              </div>
-            </div>
-            <div className="appear-15 flex items-center mt-4 md:justify-end ">
+            <div className="appear-15 flex items-center justify-center md:justify-end ">
               <button
                 onClick={async () => {
                   if (nextButtonLock) return;
@@ -94,7 +84,7 @@ const Game = (props: Props) => {
                 }}
                 className="flex items-center hover:scale-110 hover:[color_#ffa41c] text-gray-700 text-3xl font-bold py-2 px-4 rounded-xl button"
               >
-                NEXT
+                NEXT REVIEW
                 <svg
                   height="24px"
                   width="24px"
@@ -168,8 +158,27 @@ const Game = (props: Props) => {
       <div className=" text-center text-5xl font-bold p-4 md:mt-4 rounded-xl mb-4">
         Is this review real or fake?
       </div>
-      <div className="surface">
+      <div className="surface relative">
         <CustomerReview {...guessingElement.review}></CustomerReview>
+        {guessingState.type == "done" && (
+          <div
+            className="absolute top-0 right-0  -translate-x-8
+            translate-y-8
+            rotate-12"
+          >
+            <div
+              className={`bg-white ${
+                guessingElement.label
+                  ? "text-red-400 border-red-400 bg-red-100"
+                  : "text-green-400 border-green-400 bg-green-100"
+              } 
+            appear-smash
+            border-4 bg-opacity-80 text-5xl font-bold ml-3 p-2 px-3 rounded-lg shadow`}
+            >
+              {guessingElement.label ? "FAKE" : "REAL"}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="my-5">{belowReviewBoard}</div>
