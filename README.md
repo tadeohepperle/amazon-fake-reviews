@@ -1,14 +1,10 @@
-#### preparation
+#Detection Amazon Fake Reviews with Neural Networks
 
-needs the following files in /data:
+- language processing using bert models
+- stitching together reviews in a transformer model to form a context embedding
+- use product information to get a better detection context
 
-transformed (folder)
-df.csv
-products_scraped.csv
-product_reviews_scraped.csv
+## Try, if you are better than the AI model:
 
-
-#### how to run:
-
-run all cells in:
-preprecessing.ipynb
+Working demo hosted at: <br>
+http://tadeohepperle.com/amazon-fake-reviews/
