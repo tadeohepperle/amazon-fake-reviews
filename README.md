@@ -11,4 +11,7 @@ http://tadeohepperle.com/amazon-fake-reviews/
 <br>
 <br>
 
+The relevant datasets can be downloaded from:
+https://www.kaggle.com/datasets/sofiazowormazabal/amazon-fake-reviews-scrapped/settings
+
 (This was the final project in a Financial Technology Deep Learning Class at National Taiwan University (NTU), fall semester 2022)
