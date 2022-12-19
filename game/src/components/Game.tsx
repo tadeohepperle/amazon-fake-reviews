@@ -40,7 +40,7 @@ const Game = (props: Props) => {
       belowReviewBoard = (
         <div className="flex flex-wrap py-4 px-1 items-center">
           <div className="block">
-            <div className="appear-2 flex items-center ">
+            <div className="appear-1 flex items-center ">
               <span className="text-3xl font-mono">You think:</span>
               <div
                 className={`bg-white ${
@@ -55,7 +55,7 @@ const Game = (props: Props) => {
                   : "+0"}
               </span>
             </div>
-            <div className="appear-3 flex items-center mt-4">
+            <div className="appear-2 flex items-center mt-4">
               <span className="text-3xl font-mono">AI thinks:</span>
               <div
                 className={`bg-white ${
@@ -72,7 +72,7 @@ const Game = (props: Props) => {
             </div>
           </div>
           <div className="block flex-grow">
-            <div className="appear-15 flex items-center justify-center md:justify-end ">
+            <div className="appear-3 mt-5 md:mt-0 flex items-center justify-center md:justify-end ">
               <button
                 onClick={async () => {
                   if (nextButtonLock) return;

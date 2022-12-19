@@ -64,6 +64,13 @@
   animation-fill-mode: forwards;
 }
 
+.appear-4 {
+  opacity: 0;
+  animation: appear var(--appear-speed) ease-in-out
+    calc(var(--appear-speed) * 4);
+  animation-fill-mode: forwards;
+}
+
 @keyframes appear {
   0% {
     opacity: 0;
@@ -75,14 +82,14 @@
 
 .appear-smash {
   opacity: 0;
-  animation: appear-smash 200ms ease-in;
+  animation: appear-smash 100ms ease-in;
   animation-fill-mode: forwards;
 }
 
 @keyframes appear-smash {
   0% {
     opacity: 0;
-    transform: translate(-100px, 100px) rotate(-30deg) scale(5);
+    transform: translate(-100px, 100px) rotate(-30deg) scale(1.5);
   }
   50% {
     opacity: 1;
