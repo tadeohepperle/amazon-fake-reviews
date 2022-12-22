@@ -11,14 +11,13 @@ http://tadeohepperle.com/amazon-fake-reviews/
 <br>
 <br>
 
-The relevant datasets can be downloaded from: <br>
+The relevant datasets can be downloaded from [this Kaggle link.](https://www.kaggle.com/datasets/sofiazowormazabal/amazon-fake-reviews-scrapped)
 
-https://www.kaggle.com/datasets/sofiazowormazabal/amazon-fake-reviews-scrapped/settings
-
+<br>
 And the weights for the models can be found in:
 
-- 3BERT: https://www.kaggle.com/datasets/sofiazowormazabal/model-weights-full-ds-amazon-reviews
-- Context model: https://www.kaggle.com/datasets/sofiazowormazabal/context-model-weights
+- [3BERT](https://www.kaggle.com/datasets/sofiazowormazabal/miguelw)
+- [Context model](https://www.kaggle.com/datasets/sofiazowormazabal/context-model-weights)
 
 <br>
 <br>
