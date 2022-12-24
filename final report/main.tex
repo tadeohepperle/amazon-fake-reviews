@@ -1,0 +1,477 @@
+\documentclass[utf8x]{ctexart}
+\usepackage{setspace}
+\usepackage{url}
+\onehalfspacing
+\usepackage{amsmath,amssymb,amsfonts,amsthm,mathtools}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{dsfont}
+\usepackage{bbm}
+\usepackage[round]{natbib}
+\usepackage{color} 
+\usepackage[defaultlines=2,all]{nowidow}
+\usepackage{caption}
+\usepackage[labelformat=simple]{subcaption}
+\usepackage{makecell}
+\usepackage{hyperref}
+\renewcommand\thesubfigure{(\alph{subfigure})}
+
+\setlength\parindent{0pt}
+\setlength{\parskip}{6pt plus 1pt minus 1pt}
+
+\newcommand{\red}{\textcolor{red}}
+
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  {\scshape\LARGE National Taiwan University \par}
+  \vspace{1cm}
+  {\scshape\Large Financial Technology \par}
+  \vspace{2cm}
+  {\huge\bfseries Final Project: Detection of Amazon Fake Reviews\par}
+  \vspace{2cm}
+  {\Large Lecturer:\\
+    Che Lin (林澤) \par}
+  \vspace{1cm}
+  {\Large Author: Tadeo Hepperle, Student ID: A11922105 \par}
+  \vfill
+  {\large \today\par}
+\end{titlepage}
+
+
+\tableofcontents
+
+\cleardoublepage
+
+\section{Introduction}
+
+In this porject we took a look at a dataset consisting of amazon reviews that were either real or fake. Real meaning that the review was genuine and reflects the customers "real" opinion. Fake meaning that the review is probably forged with other motivations in mind, for example to boost or damage a products reputation.
+Because the majority of online shop customers rely on reviews when making their purchase decisions it is important for a platform like amazon to ensure the reviews reflect the real qualities of a product and are not misused as a marketing instrument by unethical businesses.
+To detect fake reviews we propose two different neural network models that both make heavy use of a BERT architecture to generate text embeddings that are useful in the binary classification. To see how our best model performs in action you can check out \href{https://tadeohepperle.com/amazon-fake-reviews/}{this little online game}, where you can compete against our model yourself in realtime.
+
+\subsection{Description of the Data and Preprocessing}
+
+We used a dataset uploaded by Github user aayush210789 for our report, published \href{https://github.com/aayush210789/Deception-Detection-on-Amazon-reviews-dataset}{here on Github}. The data is from a corpus of reviews published by amazon and was internally labeled as fake or real. That means the labeling was done by Amazon and we sadly do not have advanced insight into the proceedings how exactly the labels were created. We do know however that the user behavior (for example if one user writes 100 reviews in one day) and the time of writing the review (e.g. 100 days after the product was bought) played a big role in the labeling.
+The dataset consists of a csv file with the following columns:
+\begin{enumerate}
+
+  \item review\_title: title of the review
+  \item review\_text: content/text of the review, mostly moderately long text
+  \item rating: 1-5 star rating for the product
+  \item verified: 1 if there was a verified purchase before the review was submitted, else 0
+  \item label: 0 for a real review, 1 for a fake review
+  \item product\_id: every Amazon product has a unique alphanumerical id
+  \item product\_title: title of the product
+  \item category: the category of the product, in total 30 categories were present, such as PC, Baby, Books, \dots
+
+\end{enumerate}
+
+The CSV file contained exactly 10500 fake and 10500 real reviews such that imbalance was not an issue.
+The reviews encompassed 18857 Amazon products with unique IDs.
+
+\subsubsection{Scraping additional Data}
+
+We discovered that most of the products were still listed on Amazon under the same product\_id. So we wrote a script that made 18857 requests to the corresponding amazon websites, that are available under "https://www.amazon.com/dp/product\_id". For more than 86\% of the products (16309 products) the requests went through and we were able to save the entire HTML content. With these 26.4 GB of data we were able to extract much more information. For each of the products we could extract from the HTML:
+\begin{enumerate}
+  \item rating\_count: how many ratings a product had in total
+  \item rating\_avg: the average rating on a continuous scale from 1.0 to 5.0
+  \item rating1: percentage of ratings that were 1 star
+  \item \dots
+  \item rating5: percentage of ratings that were 5 stars
+  \item reviews: for each review and the front page of the product:
+        \begin{itemize}
+          \item review\_title: title of the review
+          \item review\_text: content/text of the review, mostly moderately long text
+          \item rating: 1-5 star rating for the product
+          \item verified: 1 if there was a verified purchase before the review was submitted, else 0
+          \item helpfulness: how many people found this review helpful
+        \end{itemize}
+\end{enumerate}
+
+In total we were able to scrape 99995 additional reviews from the product front pages. These reviews can be helpful in fake review detection because they help us to see a certain suspicious review in context: If a review is overly positive and has 5 stars it might be fake, but if we see that the most helpful reviews for this product are also all very positive it might be more likely that the review in question is in fact genuine.\\
+
+Using only products, for which we were able to scrape additional data, 18107 labeled reviews remained.
+There was a slight bias towards real reviews (52\% real vs 48\% fake), but that is not a big deal.
+
+\subsubsection{Splitting the Data}
+
+The data was randomly split into 3 parts:
+\begin{itemize}
+  \item Train set: 70\% of the reviews (12674)
+  \item Validation set: 20\% of the reviews (3641)
+  \item Test set: 10\% of the reviews (1792)
+\end{itemize}
+
+\subsection{Description of Methods}
+
+We propose two different models for the detection of fake reviews, the firs one is called 3-BERT the second one is called Context Embedding Model. The 3-BERT model ignored the scraped data and just used the columns from the initial dataset. The Context Embedding Model tried to use the context information of the review (e.g. what do other reviews say about the product) to produce better predictions. In theory the Context Embedding Model should be more powerful and achieve better performance, because it has access to a superset of the data that the 3-BERT model has access to.
+We use the Binary Cross Entropy Loss to train our models with gradient descent utilizing the Adam optimizer.
+
+\subsubsection{3-BERT Model}
+
+
+
+
+\subsubsection{Context Embedding Model}
+
+
+\section{Results}
+
+We discovered that the loss of all models  starts to show signs of overfitting after the first 3-10 epochs. This effect is shown in Figure~\ref{fig:overfitting} where we trained a BiGRU with a hidden size of 64 for 100 epochs.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\textwidth]{../images/BiGRU100_trainlosses.png}
+  \caption{Overfitting behavior of a BiGRU with $hidden\_size = 64$}
+  \label{fig:overfitting}
+\end{figure}
+
+
+
+
+Therefore, we choose to train our models for 10 epochs only and all statistics below are subject to this value. By experimentation a hidden size of 64 was chosen for the BiLSTM and BiGRU models.
+Figure~\ref{fig:losses1} shows training and validation losses after training the BiLSTM, BiGRU and TEL models for 10 epochs. As we can see all models reach a test and train error of around 0.05. Table~\ref{tab:accuracy} displays the accuracy of the 3 models on train, validation and test set each.
+
+
+\begin{figure}[htb]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiLSTM_trainlosses.png}
+    \caption{Train and Validation Loss BiLSTM}
+    \label{fig:BiLSTM_trainlosses}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiGRU_trainlosses.png}
+    \caption{Train and Validation Loss GRU}
+    \label{fig:BiGRU_trainlosses}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/Transformer_trainlosses.png}
+    \caption{Train and Validation Loss Transformer Encoder Layer}
+    \label{fig:TEL_trainlosses}
+  \end{subfigure}
+  \caption{Train and Validation Losses for all 3 models}
+  \label{fig:losses1}
+\end{figure}
+
+
+
+\begin{table}[ht]
+  \centering
+  \caption{Accuracy of the 3 models}
+  \label{tab:accuracy}
+  \begin{tabular}{c|cccc}
+    Accuracy & Train   & Validation & Test  \\
+    \hline
+    BiLSTM   & 0.989   & 0.992      & 0.989 \\
+    BiGRU    & 0.00103 & 0.992      & 0.989 \\
+    TEL      & 0.989   & 0.992      & 0.989 \\
+  \end{tabular}
+\end{table}
+
+
+At a first glance the values in Table~\ref{tab:accuracy} seem very good. Such a high accuracy! But taking a closer look at the confusion matrices for all models, see Fig~\ref{fig:confusion} reveals that all models just predict "no click" for every single instance in every single set. This is likely an artifact of the imbalance of the data and should probably be dealt with by choosing a different loss function or an under/oversampling approach.
+
+
+\begin{figure}[htb]
+  \centering
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiLSTM_train_conf.png}
+    \caption{BiLSTM on train}
+    \label{fig:BiLSTM_confusion_train}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiLSTM_val_conf.png}
+    \caption{BiLSTM on validation}
+    \label{fig:BiLSTM_confusion_val}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiLSTM_test_conf.png}
+    \caption{BiLSTM on test}
+    \label{fig:BiLSTM_confusion_test}
+  \end{subfigure}
+
+
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiGRU_train_conf.png}
+    \caption{BiGRU on train}
+    \label{fig:BiGRU_confusion_train}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiGRU_val_conf.png}
+    \caption{BiGRU on validation}
+    \label{fig:BiGRU_confusion_val}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiGRU_test_conf.png}
+    \caption{BiGRU on test}
+    \label{fig:BiGRU_confusion_test}
+  \end{subfigure}
+
+
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/Transformer_train_conf.png}
+    \caption{TEL on train}
+    \label{fig:Transformer_confusion_train}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/Transformer_val_conf.png}
+    \caption{TEL on validation}
+    \label{fig:Transformer_confusion_val}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/Transformer_test_conf.png}
+    \caption{TEL on test}
+    \label{fig:Transformer_confusion_test}
+  \end{subfigure}
+
+  \caption{Confusion Matrices}
+  \label{fig:confusion}
+\end{figure}
+
+\subsection{ROC and PRC}
+
+The ROC curve plots the true-positive rate against the false-positive rate, while the PRC plots precision against recall. In our case we should choose PRC because our data is very imbalanced. The ROC gives a false sense of quality because so many of the non-clicks receive a low probability. ROC curves and PRC curves are shown in  Figure~\ref{fig:roc} and Figure~\ref{fig:prc} respectively.
+
+\begin{figure}[htb]
+  \centering
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiLSTM_train_prc.png}
+    \caption{BiLSTM on train}
+    \label{fig:BiLSTM_prc_train}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiLSTM_val_prc.png}
+    \caption{BiLSTM on validation}
+    \label{fig:BiLSTM_prc_val}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiLSTM_test_prc.png}
+    \caption{BiLSTM on test}
+    \label{fig:BiLSTM_prc_test}
+  \end{subfigure}
+
+
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiGRU_train_prc.png}
+    \caption{BiGRU on train}
+    \label{fig:BiGRU_prc_train}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiGRU_val_prc.png}
+    \caption{BiGRU on validation}
+    \label{fig:BiGRU_prc_val}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiGRU_test_prc.png}
+    \caption{BiGRU on test}
+    \label{fig:BiGRU_prc_test}
+  \end{subfigure}
+
+
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/Transformer_train_prc.png}
+    \caption{TEL on train}
+    \label{fig:Transformer_prc_train}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/Transformer_val_prc.png}
+    \caption{TEL on validation}
+    \label{fig:Transformer_prc_val}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/Transformer_test_prc.png}
+    \caption{TEL on test}
+    \label{fig:Transformer_prc_test}
+  \end{subfigure}
+
+  \caption{Precision recall curves}
+  \label{fig:prc}
+\end{figure}
+
+
+\begin{figure}[htb]
+  \centering
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiLSTM_train_roc.png}
+    \caption{BiLSTM on train}
+    \label{fig:BiLSTM_roc_train}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiLSTM_val_roc.png}
+    \caption{BiLSTM on validation}
+    \label{fig:BiLSTM_roc_val}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiLSTM_test_roc.png}
+    \caption{BiLSTM on test}
+    \label{fig:BiLSTM_roc_test}
+  \end{subfigure}
+
+
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiGRU_train_roc.png}
+    \caption{BiGRU on train}
+    \label{fig:BiGRU_roc_train}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiGRU_val_roc.png}
+    \caption{BiGRU on validation}
+    \label{fig:BiGRU_roc_val}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiGRU_test_roc.png}
+    \caption{BiGRU on test}
+    \label{fig:BiGRU_roc_test}
+  \end{subfigure}
+
+
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/Transformer_train_roc.png}
+    \caption{TEL on train}
+    \label{fig:Transformer_roc_train}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/Transformer_val_roc.png}
+    \caption{TEL on validation}
+    \label{fig:Transformer_roc_val}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/Transformer_test_roc.png}
+    \caption{TEL on test}
+    \label{fig:Transformer_roc_test}
+  \end{subfigure}
+
+  \caption{receiver operating characteristic curves}
+  \label{fig:roc}
+\end{figure}
+
+Table~\ref{tab:rocprc} shows the area under curve (AUC) values for PRC and ROC on train, test and validation sets for the 3 models. Comparing the 3 models we find that they are all very similar. However, the BiGRU shows the highest values in the PRC on the test set if that is what we care about. All in all the values are so low though, that these small differences might just be statistical anomalies and could be different in another run of training. We would have thought that the transformer performed better, but it was actually the worst on all datasets when using PRC as the metric.
+
+\begin{table}[ht]
+  \centering
+  \caption{PRC and ROC AUC values of the 3 models}
+  \label{tab:rocprc}
+  \begin{tabular}{c|ccc}
+
+           & \multicolumn{3}{c}{ROC}                       \\
+           & Train                   & Validation & Test   \\
+    \hline
+    BiLSTM & 0.7927                  & 0.7673     & 0.8143 \\
+    BiGRU  & 0.7962                  & 0.7687     & 0.8161 \\
+    TEL    & 0.7963                  & 0.7658     & 0.8135 \\
+    \hline
+           &                         &            &        \\
+           & \multicolumn{3}{c}{PRC}                       \\
+           & Train                   & Validation & Test   \\
+    \hline
+    BiLSTM & 0.0832                  & 0.0529     & 0.0559 \\
+    BiGRU  & 0.0902                  & 0.0518     & 0.0675 \\
+    TEL    & 0.0745                  & 0.0457     & 0.0455 \\
+  \end{tabular}
+\end{table}
+
+\subsection{Using a different time window}
+
+In the following we retrain all models with the same configurations but this time we just allow them to learn on a) the past 3 days or b) on the past 5 days in comparison to the 10 days that were used before. As a metric of performance we compare  area under PRC and ROC curve on the test set in Table ~\ref{tab:time_comparison}. The accuracy and confusion matrices have not changed at all, still all models predict all instances to be non-click. More about how this can be addressed in the next section.
+From the values in the PRC AUC values in the table it seems like Transformer Encoder Layer and BiGRU have a slightly better test performance when only 3 days are used. For BiLSTM no real difference was visible.
+
+\begin{table}[ht]
+  \centering
+  \caption{Models trained on different time frames}
+  \label{tab:time_comparison}
+  \begin{tabular}{c|ccc}
+                   & PRC AUC & ROC AUC \\
+    \hline
+    3 days BiLSTM  & 0.052   & 0.8047  \\
+    5 days BiLSTM  & 0.0444  & 0.8098  \\
+    10 days BiLSTM & 0.0559  & 0.8143  \\
+    \hline
+    3 days BiGRU   & 0.0761  & 0.8058  \\
+    5 days BiGRU   & 0.0429  & 0.8111  \\
+    10 days BiGRU  & 0.0675  & 0.8161  \\
+    \hline
+    3 days TEL     & 0.0599  & 0.8081  \\
+    5 days TEL     & 0.0475  & 0.8121  \\
+    10 days TEL    & 0.0455  & 0.8135  \\
+  \end{tabular}
+\end{table}
+
+\subsection{Dealing with the Data Imbalance}
+
+Until now, we just predicted instances where a model gives a probability of $\leq 0.5$ as "non-click" and otherwise as "click". However, this might not be the best cutoff value. If we look at the ROC curve, we can choose the point on the curve closest to the top-left corner as the best point. We want to achieve a recall (= true positive rate) like in this point. To do so, we can take all our predicted probabilities for instances that are clicks in reality and sort them according to their predicted probability in decreasing order. Let $L$ be the length of that sequence. The element at index $L * recall$ is now the new cutoff probability we will pick for our model. On the training data the optimal cutoff value of around 0.002 to 0.04 was found for a recall of about 0.7 in the ROC curve.
+Applying this cutoff to the test data results in new confusion matrices for the models trained on the 10-day sequence as seen in Figure~\ref{fig:confadjusted}. As we see we can now detect more of the clicks but also get a huge amount of false positives.
+
+\begin{figure}[htb]
+  \centering
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiLSTMc_test_conf.png}
+    \caption{BiLSTM}
+    \label{fig:BiLSTMc_test_conf}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/BiGRUc_test_conf.png}
+    \caption{BiGRU}
+    \label{fig:BiGRUc_test_conf}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{../images/Transformerc_test_conf.png}
+    \caption{TEL}
+    \label{fig:Transformerc_test_conf}
+  \end{subfigure}
+
+  \caption{Confusion matrices on test data after adjustment of cutoff value}
+  \label{fig:confadjusted}
+\end{figure}
+
+
+
+\section{Discussion}
+
+As the results show it is really hard to have the models produce good results on their own. Because of the imbalance in the data we cannot rely on the raw predictions obtained by minimizing the binary cross entropy during training. If we did so, we would just predict every push notification as a "non-click" right from the get go, which is just not helpful and does not leverage the real power of machine learning. There are other ways however to deal with this imbalance, not shown in this report. For example, we could perform over- or undersampling.
+A real improvement could be found in the way we selected our features.
+For example one of the strongest predictors of future clicks might be past clicks. I suppose we could build a more powerful model just by utilizing the sequence of past clicks (click vs. non-click) and maybe the time of the day alone. This would however not be very useful in the general setting that we want to design interesting push notifications, but only in specific cases where the model would decide for a particular user if it makes sense to send the push notification or not.
+Another interesting feature would be time of the day. For example is it likely that people tend to click push notifications with different topics depending on if they are at work or in their leisure time. Also, comparisons with baseline models would be useful which was not done in this report.
+
+% \newpage
+% \addcontentsline{toc}{section}{Bibliography}
+% \renewcommand\refname{Bibliography}
+% \bibliographystyle{plainnat}
+% \bibliography{references}
+\end{document}

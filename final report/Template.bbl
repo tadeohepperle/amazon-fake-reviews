@@ -1,0 +1,31 @@
+\begin{thebibliography}{3}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Gu and Budhkar(2021)]{gu-budhkar}
+Ken Gu and Akshay Budhkar.
+\newblock A package for learning on tabular and text data with transformers.
+\newblock In \emph{Proceedings of the Third Workshop on Multimodal Artificial
+  Intelligence}, pages 69--73, Mexico City, Mexico, June 2021. Association for
+  Computational Linguistics.
+\newblock \doi{10.18653/v1/2021.maiworkshop-1.10}.
+\newblock URL \url{https://aclanthology.org/2021.maiworkshop-1.10}.
+
+\bibitem[Mohawesh et~al.(2021)Mohawesh, Xu, Springer, Al-Hawawreh, and
+  Maqsood]{mohawesh2021fake}
+Rami Mohawesh, Shuxiang Xu, Matthew Springer, Muna Al-Hawawreh, and Sumbal
+  Maqsood.
+\newblock Fake or genuine? contextualised text representation for fake review
+  detection.
+\newblock \emph{arXiv preprint arXiv:2112.14343}, 2021.
+
+\bibitem[Weng et~al.(2022)Weng, Lin, and Ying]{weng2022detection}
+Chia-Hsien Weng, Kuan-Cheng Lin, and Jia-Ching Ying.
+\newblock Detection of chinese deceptive reviews based on pre-trained language
+  model.
+\newblock \emph{Applied Sciences}, 12\penalty0 (7):\penalty0 3338, 2022.
+
+\end{thebibliography}
