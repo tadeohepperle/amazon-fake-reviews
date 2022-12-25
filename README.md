@@ -35,3 +35,16 @@ And the weights for the models can be found in:
 ![Miguelmodel drawio2](https://user-images.githubusercontent.com/7980453/208420039-75d3d3c3-1c7a-4a09-a9f0-c69ec4c242c1.png)
 
 (This was the final project in a Financial Technology Deep Learning Class at National Taiwan University (NTU), fall semester 2022)
+
+## How to run the code
+
+please take a look at the following files, python and node are needed to run the code:
+- scrape.js
+- extract.js
+- preprocessing.ipynb
+- model.ipynb
+- model2.ipynb
+- model2-train.ipynb
+- game (entire folder)
+- final_project_Fintech_3BERT.ipynb
+- context_model_test.ipynb
