@@ -1,0 +1,1 @@
+{"rule":"ENGLISH_WORD_REPEAT_BEGINNING_RULE","sentence":"^\\QThis is done by taking the embedding of the [CLS] token, that is inserted before the text tokens itself, as the text embedding.\\E$"}

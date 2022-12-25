@@ -1,10 +1,12 @@
-\documentclass{article}
+\documentclass[utf8x]{ctexart}
 % \documentstyle[...,spconf,...]{article}
 \usepackage{spconf,amsmath,graphicx}
 \usepackage{hyperref}
 \usepackage{array, caption, tabularx,  ragged2e,  booktabs}
 \usepackage[round]{natbib}
-
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{dsfont}
 
 % Example definitions.
 % --------------------
@@ -45,7 +47,7 @@
 \maketitle
 %
 \begin{abstract}
-  Amazon reviews are important for purchase decisions and their integrity is essential to the online platforms reputation. Because of their importance, immoral businesses have an incentive to publish fake reviews. In this paper we explore different machine learning models to detect fake reviews based on a combination of textual and numerical features. Our models use pretrained BERT embeddings as a base and achieve AUROC and AUPRC scores of up to 0.933 and 0.970 respectively.
+  Amazon reviews are important for purchase decisions and their integrity is essential to the online platforms reputation. That is why immoral businesses have an incentive to publish fake reviews. In this paper we explore different machine learning models to detect fake reviews based on a combination of textual and numerical features. Our models use pretrained BERT embeddings as a base and achieve AUROC and AUPRC scores of up to 0.933 and 0.970 respectively.
   As a main innovation we allow our models to take a look at contextual reviews for the same Amazon product to better understand if a review is fake or not.
 
 \end{abstract}
@@ -57,13 +59,17 @@
 \section{Introduction}
 \label{sec:intro}
 
-In this project we take a look at a dataset consisting of Amazon reviews that were either real or fake. Real meaning that the review was genuine and reflects the customers "real" opinion. Fake meaning that the review is probably forged with other motivations in mind, for example to boost or damage a products' reputation.
+We take a look at a dataset consisting of Amazon reviews that were either real or fake. Real meaning "genuine" and fake meaning "likely forged".
 Because the majority of online shop customers rely on reviews when making their purchase decisions it is important for a platform like Amazon to ensure the reviews reflect the real qualities of a product and are not misused as a marketing instrument by unethical businesses.
 To detect fake reviews we propose two different neural network models that both make heavy use of a BERT architecture to generate text embeddings that are useful in the binary classification. To see how our best model performs in action you can check out \href{https://tadeohepperle.com/amazon-fake-reviews/}{this little online game}, where you can compete against our model yourself in real-time.
 
+\subsection{Group Members}
+
+We were 5 people in our group: Jenny and Tim took part in researching sources, background information and cleaning the data. They also made a big part of the presentation. Zow, Miguel and me came up with the 3-BERT model and trained all models on GPU-accelerated machines. I (Tadeo) coded the web-demo and the Context Embedding Model.
+
 \subsection{Previous Work}
 
-Previous work on fake review detection was done by other researchers however most focussed on either the use of textual or non-textual features. For examples \cite{gu-budhkar} used transformer based models in a way that they transformed all features into text, reducing the problem domain to a mere binary text classification. \cite{mohawesh2021fake} used transformers combined in ensemble methods to classify texts. They also take the context of a review into consideration. \cite{weng2022detection} also detected Chinese fake reviews using pre-trained language models. Combining these approaches is one of the aims of our project.
+Previous work on fake review detection was done by other researchers however most focussed on either the use of textual or non-textual features. For example \cite{gu-budhkar} used transformer based models in a way that they transformed all features into text, reducing the problem domain to a mere binary text classification. \cite{mohawesh2021fake} used transformers combined in ensemble methods to classify texts. They also take the context of a review into consideration. \cite{weng2022detection} also detected Chinese fake reviews using pretrained language models. Combining these approaches is one of the aims of our project.
 
 \section{Material and Methods}
 \label{sec:format}
@@ -71,8 +77,8 @@ Previous work on fake review detection was done by other researchers however mos
 
 \subsection{Data and Preprocessing}
 
-We used a dataset uploaded by Github user aayush210789 for our report, published \href{https://github.com/aayush210789/Deception-Detection-on-Amazon-reviews-dataset}{here on Github}. The data is from a corpus of reviews published by amazon and was internally labeled as fake or real. That means the labeling was done by Amazon and we sadly do not have advanced insight into the proceedings how exactly the labels were created. We do know however that the user behavior (for example if one user writes 100 reviews in one day) and the time of writing the review (e.g. 100 days after the product was bought) played a big role in the labeling.
-The dataset consists of a csv file with the columns shown in table~\ref{tab:feat1}.
+We used a dataset uploaded by Github user aayush210789 for our report, published \href{https://github.com/aayush210789/Deception-Detection-on-Amazon-reviews-dataset}{here on Github}. The data is from a corpus of reviews published by Amazon and was internally labeled as fake or real.
+The dataset consists of a CSV file with columns shown in table~\ref{tab:feat1}.
 \begin{table}[ht]
   \centering
   \caption{Original features}
@@ -95,28 +101,28 @@ The dataset consists of a csv file with the columns shown in table~\ref{tab:feat
   \end{tabular}
 \end{table}
 
-The CSV file contained exactly 10,500 fake and 10,500 real reviews such that imbalance was not an issue.
+There are 10,500 fake and real reviews each, such that imbalance was not an issue.
 The reviews encompassed 18857 Amazon products with unique IDs.
 
-As Fig~\ref{fig:verified} shows, fake reviews tend to be less frequently verified purchases than real reviews. In contrast, there does not be a relationship between real vs. fake reviews and the rating. In all brackets the distribution is about equal, as Fig~\ref{fig:rating} shows.
+As Fig~\ref{fig:verified} shows, fake reviews tend to be less frequently verified purchases than real reviews. In contrast, there is no relationship between fake reviews and rating, see Fig~\ref{fig:rating}.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\linewidth]{./rating.png}
-  \caption{3-BERT ROC}
+  \includegraphics[width=0.48\linewidth]{./verified.png}
+  \caption{Verified purchases}
   \label{fig:verified}
 \end{figure}
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\linewidth]{./rating.png}
-  \caption{3-BERT ROC}
+  \includegraphics[width=0.48\linewidth]{./rating.png}
+  \caption{Ratings}
   \label{fig:rating}
 \end{figure}
 
 \subsubsection{Scraping additional Data}
 
-We discovered that most of the products were still listed on Amazon under the same product\_id. So we wrote a script that made 18857 requests to the corresponding Amazon websites, that are available under "www.amazon.com/dp/product\_id". For more than 86\% of the products (16,309 products) the requests went through, and we were able to save the entire HTML content. With these 26.4 GB of data we were able to extract much more information. For each of the products we could extract from the HTML the features from in table~\ref{tab:feat2}.
+We discovered that most products were still listed on Amazon under the same product\_id and wrote a script that made 18857 requests to the corresponding Amazon websites, that are available under "www.amazon.com/dp/product\_id". For more than 86\% of the products (16,309 items) we were able to save the HTML content. This was 26.4 GB of data. For each of the products extracted from the HTML the features from table~\ref{tab:feat2}.
 
 \begin{table}[ht]
   \centering
@@ -149,10 +155,10 @@ We discovered that most of the products were still listed on Amazon under the sa
   \end{tabular}
 \end{table}
 
-In total we were able to scrape 99,995 additional reviews from the product front pages. These reviews can be helpful in fake review detection because they help us to see a certain suspicious review in context: If a review is overly positive and has 5 stars it might be fake, but if we see that the most helpful reviews for this product are also all very positive it might be more likely that the review in question is in fact genuine.
+In total, we scraped 99,995 additional reviews from product front pages. These reviews can be helpful because they give context: If a review is overly positive it might be fake, but if the most helpful reviews for this product are also all very positive it might be more likely to be genuine.
 
 Using only products, for which we were able to scrape additional data, 18,107 labeled reviews remained.
-There was a slight bias towards real reviews (52\% real vs 48\% fake), but that is not a big deal.
+There was a slight bias towards real reviews (52\% real vs 48\% fake).
 
 \subsubsection{Splitting the Data}
 
@@ -160,25 +166,23 @@ The data was randomly split into 3 parts: 70\% of the reviews (12674) for the tr
 
 \subsection{Methods}
 
-We propose two different models for the detection of fake reviews, the firs one is called 3-BERT the second one is called Context Embedding Model. The 3-BERT model ignored the scraped data and just used the columns from the initial dataset. The Context Embedding Model tried to use the context information of the review (e.g. what do other reviews say about the product) to produce better predictions. In theory the Context Embedding Model should be more powerful and achieve better performance, because it has access to a superset of the data that the 3-BERT model has access to.
-We use the Binary Cross Entropy Loss to train our models with gradient descent utilizing the Adam optimizer.
+We propose two different models: The 3-BERT model just uses the columns from the initial dataset. The Context Embedding Model tried to use the context information of the review (e.g. what do other reviews say about the product) to produce better predictions. In theory the Context Embedding Model should be more powerful, because it has access to a superset of the 3-BERT model data.
 
 \subsubsection{3-BERT Model}
 
-The 3-BERT model architecture can be seen in \ref{fig:3bert}. It uses a pretrained bert model from huggingface, that is fine tuned to our task during the training process. This bert model converts the review text, review title and product title from the original features into a 768 dimensional embedding each. This is done by running the bert model over the sequence, which encodes each word as a 768-dimensional embedding.
-This is done by taking the embedding of the [CLS] token, that is inserted before the text tokens itself, as the text embedding.
-The 30 categories and 5 possible rating values were one-hot encoded and form together with the verified-flag a 36-dimensional vector. This is fed through a 6 layer deep fully connected neural network with dropout together with the BERT embedding of the product and review title. The result is joined with the review text embedding and again put through a fully connected neural network.
+The 3-BERT model architecture can be seen in \ref{fig:3bert}. It uses a pretrained BERT model, that is fine-tuned to our task during training. This BERT model converts the review text, review title and product title into a 768 dimensional embedding each. This is done by taking the embedding of the [CLS] token, that is inserted before the text tokens itself, as the text embedding.
+The 30 categories and 5 rating options were one-hot encoded and form together with the verified-flag a 36-dimensional vector. This is fed through a 6 layer deep fully connected neural network with dropout together with the BERT embedding of the product and review title. The result is joined with the review text embedding and again put through a fully connected neural network.
 
 \subsubsection{Context Embedding Model}
 
-The context embedding model uses all features available from the tables presented above. A central idea of this model is to create not only text embeddings but consistent embeddings for an entire review. This "review embedding network" could then be used with the same weights on reviews in question (fake vs. real) and scraped reviews because they share the same features. Fig~\ref{fig:ren} shows the architecture of this: BERT is used to get 768-dimensional embeddings for the review title and review text each. The sentiment analysis library "textblob" is used to form features "valence" and "subjectivity" for both title and text. Then all these vectors are concatenated with "rating" and "verified". This big vector is then fed through an MLP layer to form the reviews embedding. This review embedding network is only one part of the context embedding model though. It shares weights in all instances that is occurs in our model. To get a joined representation of the context we use a transformer encoder layer to feed the "review embedding" of each scraped review through it. This gives us a context embedding, that is then joined with all other product features to get a product embedding, see Fig~\ref{fig:cem}. This in turn is then then joined with the original reviews embedding for this product and put through a binary classification MLP to predict the final label: fake vs. real.
+The context embedding model uses all features available from the tables presented above. A central idea of this model is to create not only text embeddings but consistent embeddings for an entire review. This "review embedding network" is then used with the same weights on labeled and scraped reviews because they share the same features. Fig~\ref{fig:ren} shows this architecture: BERT is used to get 768-dimensional embeddings for the review title and review text each. The sentiment analysis library "textblob" is used to form features "valence" and "subjectivity" for both title and text. Then all vectors are concatenated with "rating" and "verified". This big vector is then fed through an MLP layer to form the review's embedding. The review embedding network shares weights in all instances that it occurs in. We use a transformer encoder layer to feed the "review embedding" of each scraped review to get a joined representation. This gives us a context embedding, that is concatenated with all other product features to get a product embedding, see Fig~\ref{fig:cem}. This is then joined with the original review embedding for the product and put through a binary classification MLP to predict the final label.
 
 \section{Results}
 \label{sec:results}
 
-All of our models were trained with the Adam optimizer and used the huggingface model "distilbert-base-uncased" as a base.
-The 3-BERT model used a learning rate of 0.000023 and 32 epochs with a batch size of 4. The total training time was 16.8 hours on a GPU-accelerated machine.
-The context embedding model (CEM) had a learning rate of 0.001 and trained for 10 EPOCHS with a batch size of 256 which took 7 hours. Performance differences could be due to different training times, but our computing and time resources were sadly not infinite. We compared the models to a few simpler models we trained: Unimodal: a model that transforms all features to text features and use only one BERT for the predictions. MLP + BERT:  uses MLP on categorical data and BERT for text. BERT + NN: Fine-tuned BERT (reviews only) + simple 5 layer neural network on categorical features.
+Our models were trained with the Adam optimizer with binary cross entropy loss and used the huggingface model "distilbert-base-uncased" as a base.
+The 3-BERT model used a learning rate of 0.000023 and 32 epochs with a batch size of 4. The total training time was 16.8 hours.
+The context embedding model (CEM) had a learning rate of 0.001 and trained for 10 EPOCHS with a batch size of 256 which took 7 hours. Performance differences could be due to different training times, but our computing resources were sadly limited. We compared the models to a few simpler models we trained: Unimodal: a model that transforms all features to text features and use only one BERT for the predictions. MLP + BERT:  uses MLP on categorical data and BERT for text. BERT + NN: Fine-tuned BERT (reviews only) + simple 5 layer neural network on categorical features.
 Table \ref{tab:results} shows the performance of all models in terms of AUROC and AUPRC values on unseen test data.
 
 \begin{table}[ht]
@@ -229,8 +233,7 @@ Figure \ref{fig:3bertroc} and \ref{fig:3bertprc} show the ROC and PRC curves for
 
 \section{Discussion}
 
-We were surprised that the 3-BERT model surpassed the Context Embedding model in terms of AUROC, because it uses less information. It could be the case that the tranformer encoder layer in the Context Embedding Model simply adds too much complexity and makes it hard to learn the dependencies in the data. A consideration is also that our language models could quickly run into overfitting because there are way more parameters in the model than we have training examples. This is usually prevented though by stopping early, and we did not train the models further when we realized that the validation error went up again.
-In the future it would be interesting to see what happens if we have more data available or different labels. We also feel like the models cannot be 100\% accurate in all cases, as they are a result of a different model used by Amazon. This leaves us wondering if our model could perform very differently given labels produces by a different model.
+We were surprised that the 3-BERT model surpassed the Context Embedding model in terms of AUROC, because it uses less information. It could be the case that the transformer encoder layer in the Context Embedding Model simply adds too much complexity and makes it hard to learn the dependencies in the data. In the future it would be interesting to see what happens if we have more data available or different labels. We also feel like the models cannot be 100\% accurate in all cases, as they are a result of a different model used by Amazon.
 
 \vfill\pagebreak
 
